@@ -1,0 +1,249 @@
+<resources>
+    <string name="app_name">afyabora</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="styleMaps">
+        {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#87CEFA"
+                        },
+                        {
+                            "lightness": 17
+                        }
+                    ]
+                },
+                {
+                    "featureType": "landscape",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#f5f5f5"
+                        },
+                        {
+                            "lightness": 20
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.fill",
+                    "stylers": [{
+                            "color": "#ffffff"
+                        },
+                        {
+                            "lightness": 17
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{
+                            "color": "#ffffff"
+                        },
+                        {
+                            "lightness": 29
+                        },
+                        {
+                            "weight": 0.2
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.arterial",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#ffffff"
+                        },
+                        {
+                            "lightness": 18
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.local",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#87CEFA"
+                        },
+                        {
+                            "lightness": 16
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#87CEFA"
+                        },
+                        {
+                            "lightness": 21
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#DEB887"
+                        },
+                        {
+                            "lightness": 21
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [{
+                            "visibility": "on"
+                        },
+                        {
+                            "color": "#ffffff"
+                        },
+                        {
+                            "lightness": 16
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [{
+                            "saturation": 36
+                        },
+                        {
+                            "color": "#333333"
+                        },
+                        {
+                            "lightness": 40
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.icon",
+                    "stylers": [{
+                        "visibility": "on"
+                    }]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [{
+                            "color": "#f2f2f2"
+                        },
+                        {
+                            "lightness": 19
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.fill",
+                    "stylers": [{
+                            "color": "#008080"
+                        },
+                        {
+                            "lightness": 20
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry.stroke",
+                    "stylers": [{
+                            "color": "#008080"
+                        },
+                        {
+                            "lightness": 17
+                        },
+                        {
+                            "weight": 1.2
+                        }
+                    ]
+                }
+
+    </string>
+    <string name="keyMpaBox">pk.eyJ1IjoiaGxhbWEiLCJhIjoiY2poYXBoMTc1MHEzZjM1dGlubHlpbDl2ZCJ9.5SJN01846E0Um0BpkaxSuA</string>
+    <string name="msg_not_cnx_fr">Vous n\'êtes pas connecté sur internet</string>
+    <string name="msg_not_cnx_en">You are not connected on the internet</string>
+    <string name="msg_not_cnx_pt">Você não está conectado na internet</string>
+    <string name="msg_not_cnx_es">Usted no está conectado a internet</string>
+    <string name="hint_en_search">Search a cities</string>
+    <string name="hint_fr_search">Rechercher des villes</string>
+    <string name="hint_es_search">Buscar ciudades</string>
+    <string name="hint_pt_search">Pesquisar cidades</string>
+    <string-array name="category_fr">
+        <item>Qui êtes-vous?</item>
+        <item>Médécin</item>
+        <item>Utilisateur</item>
+    </string-array>
+
+    <string-array name="category_en">
+        <item>Who are you?</item>
+        <item>Docteur</item>
+        <item>User</item>
+    </string-array>
+
+
+    <string-array name="streets_kinshasa">
+        <item>Bandalungwa</item>
+        <item>Barumbu</item>
+        <item>Bumbu</item>
+        <item>Gombe</item>
+        <item>Kalamu</item>
+        <item>Kasa-Vubu</item>
+        <item>Kimbanseke</item>
+        <item>Kinshasa</item>
+        <item>Kintambo</item>
+        <item>Kisenso</item>
+        <item>Lemba</item>
+        <item>Limete</item>
+        <item>Lingwala</item>
+        <item>Makala</item>
+        <item>Maluku</item>
+        <item>Masina</item>
+        <item>Matete</item>
+        <item>Mont-Ngafula</item>
+        <item>Ndjili</item>
+        <item>Ngaba</item>
+        <item>Ngaliema</item>
+        <item>Ngiri-Ngiri</item>
+        <item>Nsele</item>
+        <item>Selembao</item>
+    </string-array>
+    <string name="msg_GPS_fr">Activer la géolocalisation</string>
+    <string name="msg_GPS_en">Enable geolocation</string>
+    <string name="msg_GPS_es">Habilitar geolocalización</string>
+    <string name="msg_GPS_pt">Ativar geolocalização</string>
+
+
+    <string name="loading_viewmap_fr_msg">Chargement de la ViewMap</string>
+    <string name="loading_viewmap_en_msg">Loading ViewMap</string>
+    <string name="loading_viewmap_pt_msg">Carregando o ViewMap</string>
+    <string name="loading_viewmap_es_msg">Cargando la ViewMap</string>
+    <string name="loading_viewmap_fr_title">Chargement des données</string>
+    <string name="loading_viewmap_en_title">Loading datas</string>
+    <string name="loading_viewmap_pt_title">Carregando dados</string>
+    <string name="loading_viewmap_es_title">Cargando datos</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="lbl_loading_map_fr">Chargement de la ViewMap</string>
+</resources>
