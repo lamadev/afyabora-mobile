@@ -59,9 +59,11 @@ public class DoctorsFragment extends Fragment {
                 @Override
                 public void onRefresh() {
                     Toast.makeText(getContext(), "In Refreshing....", Toast.LENGTH_SHORT).show();
+                   /*
                     mItems.clear();
                     mAdapter= new AdapterViewList(mItems);
                     mRecyclerView.setAdapter(mAdapter);
+                    */
                 }
             });
            // Typeface tf=Typeface.createFromAsset(getActivity().getAssets(),"fonts/Roboto-LightItalic.ttf");
@@ -76,7 +78,7 @@ public class DoctorsFragment extends Fragment {
             mItems= new HashMap<>();
 
             for (int i=0;i<=80;i++){
-                mItems.put("comedy"+i, R.drawable.iconscogs);
+                mItems.put("comedy"+i, R.drawable.avatar);
             }
 
             mAdapter= new AdapterViewList(mItems);

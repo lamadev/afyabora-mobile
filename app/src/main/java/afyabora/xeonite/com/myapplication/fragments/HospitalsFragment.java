@@ -100,6 +100,7 @@ public class HospitalsFragment extends Fragment {
                         try {
                             Address address= geocoder.getFromLocation(latitude,longitude,1).get(0);
                             Toast.makeText(getContext(), "Country :"+address.getCountryCode()+", Town:"+address.getLocality(), Toast.LENGTH_SHORT).show();
+                            //drawMap();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -171,9 +172,7 @@ public class HospitalsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Configuration.getInstance().load(getActivity().getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()));
-        toolbar = (android.support.v7.widget.Toolbar)getActivity().findViewById(R.id.mytoolbar2);
-        activity=((AppCompatActivity)getActivity());
-        activity.setSupportActionBar(toolbar);
+
         String message="";
         switch (Locale.getDefault().getLanguage()){
             case "fr":
@@ -202,15 +201,16 @@ public class HospitalsFragment extends Fragment {
              textViewLoadViewMap.setText(message);
              runtime_permission();
 
-            if (isTracker==false){
+        if (isTracker==false){
                 // i.setFlags(DriveFile.MODE_READ_ONLY);
+               //
                 iGPS = new Intent(getActivity().getApplicationContext(),GPS_Service.class);
-                this.drawMap();
                 getActivity().getApplicationContext().startService(iGPS);
+            this.drawMap();
             }else{
                 Toast.makeText(getActivity(), "View Kinshasa", Toast.LENGTH_SHORT).show();
                 startPoint=new GeoPoint(-4.3685,15.3575);
-                this.drawMap();
+                this.drawMap(startPoint);
             }
             //  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0.0f, this);
             // SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.hospital_fragment);
@@ -228,14 +228,30 @@ public class HospitalsFragment extends Fragment {
 
     }
     private void drawMap(){
+        //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
+        GeoPoint startPointLocalDB=new GeoPoint(-4.3685,15.3575);
         mapView=viewBase.findViewById(R.id.mapViewer);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapView.setBuiltInZoomControls(true);
+        mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
         mapController= mapView.getController();
-        mapController.setCenter(startPoint);
-        mapController.animateTo(startPoint);
-        mapController.setZoom(14);
+        mapController.setCenter(startPointLocalDB);
+        mapController.animateTo(startPointLocalDB);
+        mapController.setZoom(13);
+        mapView.setVisibility(View.VISIBLE);
+        AddMarkersWithOutGPS(viewBase,"Kinshasa",startPointLocalDB);
+    }
+    private void drawMap(GeoPoint geoPoint){
+        //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
+        mapView=viewBase.findViewById(R.id.mapViewer);
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setBuiltInZoomControls(false);
+        mapView.setMultiTouchControls(true);
+        mapController= mapView.getController();
+        mapController.setCenter(geoPoint);
+        mapController.animateTo(geoPoint);
+        mapController.setZoom(13);
+        mapView.setVisibility(View.VISIBLE);
     }
     private void AddMarker(GeoPoint center){
         try{
@@ -371,6 +387,101 @@ public class HospitalsFragment extends Fragment {
        }else {
 
        }
+    }
+
+
+    public void AddMarkersWithOutGPS(final View view, final String localityName, final GeoPoint geoPoint){
+        if (refreshQuery){
+            try{
+                if (Network.statusConnectivity(getActivity().getApplicationContext())){
+                    new HttpQueries(HospitalsFragment.this.getContext(),"http://cide-rdc.org/public/dist/dataLocation.json", Locale.getDefault().getLanguage(),new AsyncQueryCallback() {
+                        @Override
+                        public void getResponse(Object obj) {
+
+                            if (obj instanceof JSONArray){
+                                try{
+                                    JSONObject jObject=new JSONArray(obj.toString()).getJSONObject(0);
+                                    JSONArray arrayTowns=new JSONArray(obj.toString());
+
+                                    String town=jObject.getString("Town");
+                                    double lat=LAT;
+                                    double lng=LNG;
+                                    if (geoPoint!=null){
+                                        lat=geoPoint.getLatitude();
+                                        lng=geoPoint.getLongitude();
+                                        //Toast.makeText(getContext(), "Not null Geopoint", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    // Add a marker in Sydney and move the camera
+                                    //GeoPoint geoPoint=new GeoPoint(lat,lng);
+                                    if (mapView==null){
+                                        mapView=view.findViewById(R.id.mapViewer);
+                                        mapView.setTileSource(TileSourceFactory.MAPNIK);
+                                        mapView.setBuiltInZoomControls(true);
+                                        mapView.setMultiTouchControls(true);
+                                        mapController= mapView.getController();
+                                        mapController.setZoom(13);
+                                        startPoint = new GeoPoint(lat,lng);
+                                        mapController.animateTo(startPoint);
+                                    }
+
+                                    JSONArray coordonates=jObject.getJSONArray("Coordonates");
+                                    Polygon polygon = null;
+
+                                    JSONArray arrayAreas=jObject.getJSONArray("AreaDPS");
+                                    for (int i=0;i<arrayAreas.length();i++){
+                                        final JSONObject json=arrayAreas.getJSONObject(i);
+                                        GeoPoint latlng=new GeoPoint(
+                                                json.getJSONObject("Coordonates").getDouble("lat"),
+                                                json.getJSONObject("Coordonates").getDouble("lng"));
+                                        Marker marker=new Marker(mapView);
+                                        marker.setPosition(latlng);
+                                        marker.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+                                        marker.setIcon(getResources().getDrawable(R.drawable.iconmedicalbag));
+                                        marker.setTitle(json.getString("name"));
+                                        mapView.getOverlays().add(marker);
+                                        marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                                            @Override
+                                            public boolean onMarkerClick(Marker marker, MapView mapView) {
+                                                if (!json.isNull("Hospitals")){
+                                                    try{
+                                                        JSONArray arrayHospitals=json.getJSONArray("Hospitals");
+                                                        Toast.makeText(getContext(), "Title : "+arrayHospitals.length(), Toast.LENGTH_SHORT).show();
+
+                                                    }catch (Exception e){
+                                                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                }
+                                                return true;
+                                            }
+                                        });
+
+                                    }
+                                    mapView.setVisibility(View.VISIBLE);
+                                    //getActivity().findViewById(R.id.containerHospitalMap).setVisibility(View.VISIBLE);
+                                    // Toast.makeText(HospitalsFragment.this.getContext(),"Response Style :"+Boolean.toString(b), Toast.LENGTH_SHORT).show();
+                                }catch(Exception e){
+                                    Toast.makeText(HospitalsFragment.this.getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                                }
+
+                            }else{
+                                Toast.makeText(HospitalsFragment.this.getContext(), "Error:"+obj.toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }).execute();
+                }else {
+                    Toast.makeText(getActivity(), AppConfig.getMessageOutConnection(getActivity()), Toast.LENGTH_SHORT).show();
+
+                }
+            }catch(Exception e){
+
+            }
+            refreshQuery=false;
+        }else {
+
+        }
     }
 
 

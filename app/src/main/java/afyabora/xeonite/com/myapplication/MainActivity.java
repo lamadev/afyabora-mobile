@@ -172,10 +172,10 @@ public class MainActivity extends AppCompatActivity{
         tabLayout = (TabLayout) findViewById(R.id.mytabs);
         tabLayout.setupWithViewPager(viewPager);
        // TextView header=(TextView)findViewById(R.id.title_header);
-        //TextView appname=(TextView)findViewById(R.id.lbl_appname);
+        TextView appname=(TextView)findViewById(R.id.lblappname);
         Typeface tf=Typeface.createFromAsset(getAssets(),"fonts/Roboto-Light.ttf");
       //  header.setTypeface(tf);
-       // appname.setTypeface(tf);
+        appname.setTypeface(tf);
         Button btn_saved=(Button)findViewById(R.id.btn_saved);
         btn_saved.setTypeface(tf);
 
