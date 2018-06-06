@@ -19,7 +19,7 @@ public class ModelExecutor {
 
     public ModelExecutor(Context _ctx){
         this.ctx=_ctx;
-        persistenceInit=new PersistenceInit(this.ctx,"afyabora.db",null,5);
+        persistenceInit=new PersistenceInit(_ctx,"afyabora.db",null,1);
     }
     public boolean openDatabase(){
         database=persistenceInit.getWritableDatabase();
@@ -40,8 +40,9 @@ public class ModelExecutor {
     public CountryData getCountryDataByTown(String codeISO,String Town){
         CountryData countryData=null;
         try {
-           String query="SELECT * FROM hospitals WHERE codeISO=? AND town=?";
-           Cursor cursor=database.rawQuery(query,new String[]{codeISO,Town});
+            if (database!=null){
+                String query="SELECT * FROM hospitals WHERE codeISO=? AND town=?";
+                Cursor cursor=database.rawQuery(query,new String[]{codeISO,Town});
            /*while (cursor.moveToNext()){
                countryData=new CountryData();
                countryData.setId(cursor.getInt(0));
@@ -52,11 +53,32 @@ public class ModelExecutor {
            }
            cursor.close();
            */
+            }else{
+                Toast.makeText(ctx, "Is Null", Toast.LENGTH_SHORT).show();
+            }
+
        }catch (Exception e){
            Toast.makeText(ctx, "Exception :"+e.getMessage(), Toast.LENGTH_SHORT).show();
        }
         return countryData;
 
+    }
+    public CountryData getCountryLast(){
+        CountryData countryData=null;
+        String query="SELECT * FROM hospitals DESC id";
+        Cursor cursor=database.rawQuery(query,null);
+        if (cursor.getCount()>0){
+            while (cursor.moveToNext()){
+                countryData=new CountryData();
+                countryData.setId(cursor.getInt(0));
+                countryData.setCodeISO(cursor.getString(1));
+                countryData.setCountryName(cursor.getString(2));
+                countryData.setTown(cursor.getString(3));
+                countryData.setContent(cursor.getString(4));
+                break;
+            }
+        }
+        return countryData;
     }
 
     public boolean closeDataBase(){

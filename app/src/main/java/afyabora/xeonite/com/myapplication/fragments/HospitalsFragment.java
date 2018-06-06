@@ -11,6 +11,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -18,6 +21,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,7 +35,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -84,6 +90,9 @@ public class HospitalsFragment extends Fragment {
     private boolean isTracker;
     private TextView textViewLoadViewMap=null;
     private ModelExecutor dbExecutor=null;
+    private String dataFacility=null;
+    private ProgressBar pb=null;
+    private boolean isGPS=false;
     @Override
     public void onResume() {
         super.onResume();
@@ -102,9 +111,12 @@ public class HospitalsFragment extends Fragment {
                         try {
                             Address address= geocoder.getFromLocation(latitude,longitude,1).get(0);
                             Toast.makeText(getContext(), "Country :"+address.getCountryCode()+", Town:"+address.getLocality(), Toast.LENGTH_SHORT).show();
+                            isGPS=true;
                             dbExecutor=new ModelExecutor(getContext());
+                            dbExecutor.openDatabase();
                             if(dbExecutor.getCountryDataByTown(address.getCountryCode(),address.getLocality())==null){
                                 Toast.makeText(getContext(), "Not exist in db", Toast.LENGTH_SHORT).show();
+                                dbExecutor.insertDataCountryByTown(address.getCountryCode(),address.getCountryName(),address.getLocality(),"");
 
                             }else{
                                 Toast.makeText(getContext(), "Exist in db", Toast.LENGTH_SHORT).show();
@@ -181,8 +193,59 @@ public class HospitalsFragment extends Fragment {
     //@SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        viewBase = inflater.inflate(R.layout.layout_fragment_hospital, container, false);
         Configuration.getInstance().load(getActivity().getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()));
+       try{
+           Chronometer chronometer=(Chronometer)viewBase.findViewById(R.id.tickTime);
+           chronometer.setBase(SystemClock.elapsedRealtime());
+           chronometer.start();
+           chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+               @Override
+               public void onChronometerTick(Chronometer chronometer) {
+                   long time=(SystemClock.elapsedRealtime() - chronometer.getBase())/1000;
+                   if (time==20 && !isGPS){
+                    String mess=null;
 
+                       LayoutInflater layout_inflater= LayoutInflater.from(getContext());
+                       final View layout_view=layout_inflater.inflate(R.layout.layout_icon_late_gps,null);
+                       AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+                       TextView tlate=(TextView)layout_view.findViewById(R.id.lbl_late_gps);
+                       builder.setCancelable(true);
+                    switch (Locale.getDefault().getLanguage()){
+                        case "fr":
+                            builder.setTitle("Localisation");
+                            tlate.setText(R.string.late_gps_fr);
+                            break;
+
+                        case "en":
+                            builder.setTitle("Location");
+                            tlate.setText(R.string.late_gps_en);
+                            break;
+
+                        case "es":
+                            builder.setTitle("Ubicación");
+                            tlate.setText(R.string.late_gps_es);
+                            break;
+
+                        case "pt":
+                            builder.setTitle("Localização");
+                            tlate.setText(R.string.late_gps_pt);
+                            break;
+                        default:
+                            builder.setTitle("Location");
+                            tlate.setText(R.string.late_gps_fr);
+                            break;
+                    }
+                       AlertDialog dialog=builder.create();
+                       dialog.show();
+
+                   }
+               }
+           });
+
+       }catch (Exception e){
+           Toast.makeText(getActivity(), "Error:"+e.getMessage(), Toast.LENGTH_SHORT).show();
+       }
         String message="";
         switch (Locale.getDefault().getLanguage()){
             case "fr":
@@ -206,7 +269,7 @@ public class HospitalsFragment extends Fragment {
         }
 
 
-            viewBase = inflater.inflate(R.layout.layout_fragment_hospital, container, false);
+
             textViewLoadViewMap=(TextView)viewBase.findViewById(R.id.lbl_loading_map);
              textViewLoadViewMap.setText(message);
              runtime_permission();
@@ -239,7 +302,7 @@ public class HospitalsFragment extends Fragment {
     }
     private void drawMap(){
         //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
-        GeoPoint startPointLocalDB=new GeoPoint(-4.3685,15.3575);
+        /*GeoPoint startPointLocalDB=new GeoPoint(-4.3685,15.3575);
         mapView=viewBase.findViewById(R.id.mapViewer);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(false);
@@ -249,7 +312,8 @@ public class HospitalsFragment extends Fragment {
         mapController.animateTo(startPointLocalDB);
         mapController.setZoom(13);
         mapView.setVisibility(View.VISIBLE);
-        AddMarkersWithOutGPS(viewBase,"Kinshasa",startPointLocalDB);
+        */
+        //AddMarkersWithOutGPS(viewBase,"Kinshasa",startPointLocalDB);
     }
     private void drawMap(GeoPoint geoPoint){
         //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
@@ -266,6 +330,7 @@ public class HospitalsFragment extends Fragment {
     private void AddMarker(GeoPoint center){
         try{
             if (startPoint==null){
+                drawMap(center);
                 startPoint=center;
                 mapController.animateTo(center);
                 markerPoint=new Marker(mapView);
@@ -404,6 +469,7 @@ public class HospitalsFragment extends Fragment {
         if (refreshQuery){
             try{
                 if (Network.statusConnectivity(getActivity().getApplicationContext())){
+
                     new HttpQueries(HospitalsFragment.this.getContext(),"http://cide-rdc.org/public/dist/dataLocation.json", Locale.getDefault().getLanguage(),new AsyncQueryCallback() {
                         @Override
                         public void getResponse(Object obj) {
