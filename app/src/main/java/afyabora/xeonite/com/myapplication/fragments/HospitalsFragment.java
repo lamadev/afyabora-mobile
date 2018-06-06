@@ -56,6 +56,7 @@ import afyabora.xeonite.com.myapplication.R;
 import afyabora.xeonite.com.myapplication.appconfig.AppConfig;
 import afyabora.xeonite.com.myapplication.appconfig.QueryType;
 import afyabora.xeonite.com.myapplication.com.afya.GPS.GPS_Service;
+import afyabora.xeonite.com.myapplication.database.ModelExecutor;
 import afyabora.xeonite.com.myapplication.web.AsyncQueryCallback;
 import afyabora.xeonite.com.myapplication.web.HttpQueries;
 import afyabora.xeonite.com.myapplication.web.Network;
@@ -82,6 +83,7 @@ public class HospitalsFragment extends Fragment {
     private AppCompatActivity activity=null;
     private boolean isTracker;
     private TextView textViewLoadViewMap=null;
+    private ModelExecutor dbExecutor=null;
     @Override
     public void onResume() {
         super.onResume();
@@ -100,6 +102,14 @@ public class HospitalsFragment extends Fragment {
                         try {
                             Address address= geocoder.getFromLocation(latitude,longitude,1).get(0);
                             Toast.makeText(getContext(), "Country :"+address.getCountryCode()+", Town:"+address.getLocality(), Toast.LENGTH_SHORT).show();
+                            dbExecutor=new ModelExecutor(getContext());
+                            if(dbExecutor.getCountryDataByTown(address.getCountryCode(),address.getLocality())==null){
+                                Toast.makeText(getContext(), "Not exist in db", Toast.LENGTH_SHORT).show();
+
+                            }else{
+                                Toast.makeText(getContext(), "Exist in db", Toast.LENGTH_SHORT).show();
+                            }
+
                             //drawMap();
                         } catch (IOException e) {
                             e.printStackTrace();
