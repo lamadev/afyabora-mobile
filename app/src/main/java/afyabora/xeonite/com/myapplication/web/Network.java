@@ -26,4 +26,5 @@ public class Network {
         }
         return haveConnectedWifi || haveConnectedMobile;
     }
+    public static String UrlDataLocation="http://cide-rdc.org/public/dist/dataLocation.json";
 }

@@ -1,15 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="afyabora.xeonite.com.myapplication.osmActivity">
 
-    <org.osmdroid.views.MapView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/osmView">
 
-    </org.osmdroid.views.MapView>
-</android.support.constraint.ConstraintLayout>
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorGreen"
+        android:theme="@style/AppTheme.NoActionBar.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorGreen"
+            app:popupTheme="@style/AppTheme.NoActionBar.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_hospital"
+            android:layout_width="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:layout_height="wrap_content"
+
+            android:background="@android:color/white"
+            android:clickable="true"
+            android:tint="@color/colorGreen"
+            android:layout_marginBottom="130dp"
+            android:layout_marginRight="10dp"
+            app:backgroundTint="@color/colorPrimary"
+            app:srcCompat="@drawable/iconmedicalbag" />
+
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_pharmacy"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_height="wrap_content"
+
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:tint="@color/colorGreen"
+        android:layout_marginBottom="70dp"
+        android:layout_marginRight="10dp"
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@drawable/iconpills" />
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_search_alls"
+        android:layout_width="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_height="wrap_content"
+
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:tint="@color/colorGreen"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@drawable/iconmedicaldoctor" />
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+
+        android:orientation="vertical">
+        <Chronometer
+            android:id="@+id/tickTime"
+            android:visibility="gone"
+            android:format="%s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="40sp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_marginTop="30dp"
+            android:textColor="@color/colorGreen"
+            android:textAlignment="center"
+            android:id="@+id/lbl_loading_map_hosto"/>
+        <ProgressBar
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/pb"
+            android:indeterminate="true"
+            android:layout_gravity="center"/>
+    </LinearLayout>
+    <include
+        layout="@layout/layout_view_map_hosto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></include>
+
+</android.support.design.widget.CoordinatorLayout>

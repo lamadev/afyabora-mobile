@@ -6,6 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+
 import afyabora.xeonite.com.myapplication.R;
 
 
@@ -14,6 +21,8 @@ import afyabora.xeonite.com.myapplication.R;
  */
 
 public class PharmaciesFragment extends Fragment {
+    private MapView mapView;
+    private MapController mapController;
     public PharmaciesFragment(){}
 
     @Override
@@ -23,6 +32,8 @@ public class PharmaciesFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.layout_fragment_pharmacy, container, false);
+        View v=inflater.inflate(R.layout.layout_fragment_pharmacy, container, false);
+
+        return v;
     }
 }

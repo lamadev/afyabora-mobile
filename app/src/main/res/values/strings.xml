@@ -247,8 +247,13 @@
 
     <string name="lbl_loading_map_fr">Chargement de la ViewMap</string>
 
-    <string name="late_gps_fr">problème de géolocalisation, nous avons une difficulté de vous localiser</string>
-    <string name="late_gps_pt">problema de geolocalização, temos dificuldade em localizar você </string>
-    <string name="late_gps_en">problem of geolocation, we have a difficulty to locate you </string>
-    <string name="late_gps_es">problema de geolocalización, tenemos una dificultad para localizarlo</string>
+    <string name="late_gps_fr">Problème de géolocalisation, nous avons une difficulté de vous localiser</string>
+    <string name="late_gps_pt">Problema de geolocalização, temos dificuldade em localizar você </string>
+    <string name="late_gps_en">Problem of geolocation, we have a difficulty to locate you </string>
+    <string name="late_gps_es">Problema de geolocalización, tenemos una dificultad para localizarlo</string>
+    <string name="title_activity_main_view">MainViewActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_first">FirstActivity</string>
 </resources>

@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.location.Address;
@@ -41,7 +42,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
+
 import com.google.android.gms.maps.model.Polygon;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.api.IGeoPoint;
@@ -67,6 +70,8 @@ import afyabora.xeonite.com.myapplication.web.AsyncQueryCallback;
 import afyabora.xeonite.com.myapplication.web.HttpQueries;
 import afyabora.xeonite.com.myapplication.web.Network;
 
+import static android.content.Context.LOCATION_SERVICE;
+
 /**
  * Created by hornellama on 14/05/2018.
  */
@@ -75,75 +80,73 @@ public class HospitalsFragment extends Fragment {
 
     private MapView mapView = null;
     private IMapController mapController = null;
-    private final static double LNG=15.2663;
-    private final static double LAT=-4.44193;
-    private GeoPoint startPoint=null;
+    private final static double LNG = 15.2663;
+    private final static double LAT = -4.44193;
+    private GeoPoint startPoint = null;
     private BroadcastReceiver broadcastReceiver;
-    private  Intent iGPS=null;
-    private Marker markerPoint=null;
-    private View viewBase=null;
-    private Geocoder geocoder=null;
-    private List<Address> addresses=null;
-    private static boolean refreshQuery=true;
-    private android.support.v7.widget.Toolbar toolbar=null;
-    private AppCompatActivity activity=null;
+    private Intent iGPS = null;
+    private Marker markerPoint = null;
+    private View viewBase = null;
+    private Geocoder geocoder = null;
+    private List<Address> addresses = null;
+    private static boolean refreshQuery = true;
+    private android.support.v7.widget.Toolbar toolbar = null;
+    private AppCompatActivity activity = null;
     private boolean isTracker;
-    private TextView textViewLoadViewMap=null;
-    private ModelExecutor dbExecutor=null;
-    private String dataFacility=null;
-    private ProgressBar pb=null;
-    private boolean isGPS=false;
+    private TextView textViewLoadViewMap = null;
+    private ModelExecutor dbExecutor = null;
+    private String dataFacility = null;
+    private ProgressBar pb = null;
+    private boolean isGPS = false;
+    private Address address;
+    LocationManager mLocationManager = null;
+    LocationListener mLocationListener = null;
+
+    @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
         super.onResume();
-       // Toast.makeText(getContext(), "Resume is Launch", Toast.LENGTH_SHORT).show();
-        try{
-            if (broadcastReceiver==null){
-                //Toast.makeText(getContext(), "BroadCast is listen", Toast.LENGTH_SHORT).show();
-                broadcastReceiver=new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
-                        String coordinates=intent.getExtras().get("coordinates").toString();
-                        double latitude=Double.parseDouble(coordinates.split(";")[0]);
-                        double longitude=Double.parseDouble(coordinates.split(";")[1]);
-                        // Toast.makeText(getActivity().getApplicationContext(), "Latitude :"+latitude+ "And Longitude: "+longitude, Toast.LENGTH_SHORT).show();
-                        geocoder=new Geocoder(getContext());
-                        try {
-                            Address address= geocoder.getFromLocation(latitude,longitude,1).get(0);
-                            Toast.makeText(getContext(), "Country :"+address.getCountryCode()+", Town:"+address.getLocality(), Toast.LENGTH_SHORT).show();
-                            isGPS=true;
-                            dbExecutor=new ModelExecutor(getContext());
-                            dbExecutor.openDatabase();
-                            if(dbExecutor.getCountryDataByTown(address.getCountryCode(),address.getLocality())==null){
-                                Toast.makeText(getContext(), "Not exist in db", Toast.LENGTH_SHORT).show();
-                                dbExecutor.insertDataCountryByTown(address.getCountryCode(),address.getCountryName(),address.getLocality(),"");
+        mLocationListener=new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                geocoder=new Geocoder(getActivity());
+                try {
+                    address=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0);
+                    startPoint=new GeoPoint(location.getLatitude(),location.getLongitude());
+                    DrawMap(startPoint);
 
-                            }else{
-                                Toast.makeText(getContext(), "Exist in db", Toast.LENGTH_SHORT).show();
-                            }
-
-                            //drawMap();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        GeoPoint me=new GeoPoint(latitude,longitude);
-                        AddMarker(me);
-                    }
-                };
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getActivity(), "Lat :"+location.getLatitude()+"lng :"+location.getLongitude(), Toast.LENGTH_SHORT).show();
             }
-            getActivity().getApplicationContext().registerReceiver(broadcastReceiver,new IntentFilter("location_update"));
 
-        }catch (Exception e){
-            Toast.makeText(getActivity(), "Error: "+e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+                Toast.makeText(getActivity(), "The Service is on", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        mLocationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0.0f, mLocationListener);
 
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (broadcastReceiver!=null){
-            if (iGPS!=null){
+        if (broadcastReceiver != null) {
+            if (iGPS != null) {
                 getActivity().getApplicationContext().stopService(iGPS);
             }
             getActivity().getApplicationContext().unregisterReceiver(broadcastReceiver);
@@ -153,8 +156,8 @@ public class HospitalsFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (broadcastReceiver!=null){
-            if (iGPS!=null){
+        if (broadcastReceiver != null) {
+            if (iGPS != null) {
                 getActivity().getApplicationContext().stopService(iGPS);
             }
             getActivity().getApplicationContext().unregisterReceiver(broadcastReceiver);
@@ -163,10 +166,11 @@ public class HospitalsFragment extends Fragment {
 
     public HospitalsFragment() {
     }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -183,6 +187,7 @@ public class HospitalsFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,62 +195,14 @@ public class HospitalsFragment extends Fragment {
 
     }
 
+
+
     //@SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        viewBase = inflater.inflate(R.layout.layout_fragment_hospital, container, false);
-        Configuration.getInstance().load(getActivity().getApplicationContext(), PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()));
-       try{
-           Chronometer chronometer=(Chronometer)viewBase.findViewById(R.id.tickTime);
-           chronometer.setBase(SystemClock.elapsedRealtime());
-           chronometer.start();
-           chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-               @Override
-               public void onChronometerTick(Chronometer chronometer) {
-                   long time=(SystemClock.elapsedRealtime() - chronometer.getBase())/1000;
-                   if (time==20 && !isGPS){
-                    String mess=null;
-
-                       LayoutInflater layout_inflater= LayoutInflater.from(getContext());
-                       final View layout_view=layout_inflater.inflate(R.layout.layout_icon_late_gps,null);
-                       AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
-                       TextView tlate=(TextView)layout_view.findViewById(R.id.lbl_late_gps);
-                       builder.setCancelable(true);
-                    switch (Locale.getDefault().getLanguage()){
-                        case "fr":
-                            builder.setTitle("Localisation");
-                            tlate.setText(R.string.late_gps_fr);
-                            break;
-
-                        case "en":
-                            builder.setTitle("Location");
-                            tlate.setText(R.string.late_gps_en);
-                            break;
-
-                        case "es":
-                            builder.setTitle("Ubicación");
-                            tlate.setText(R.string.late_gps_es);
-                            break;
-
-                        case "pt":
-                            builder.setTitle("Localização");
-                            tlate.setText(R.string.late_gps_pt);
-                            break;
-                        default:
-                            builder.setTitle("Location");
-                            tlate.setText(R.string.late_gps_fr);
-                            break;
-                    }
-                       AlertDialog dialog=builder.create();
-                       dialog.show();
-
-                   }
-               }
-           });
-
-       }catch (Exception e){
-           Toast.makeText(getActivity(), "Error:"+e.getMessage(), Toast.LENGTH_SHORT).show();
-       }
+        viewBase = inflater.inflate(R.layout.layout_fragment_hospitalviewmap, container, false);
+        Configuration.getInstance().load(getContext(), PreferenceManager.getDefaultSharedPreferences(getContext()));
         String message="";
         switch (Locale.getDefault().getLanguage()){
             case "fr":
@@ -271,20 +228,21 @@ public class HospitalsFragment extends Fragment {
 
 
             textViewLoadViewMap=(TextView)viewBase.findViewById(R.id.lbl_loading_map);
-             textViewLoadViewMap.setText(message);
+            textViewLoadViewMap.setText(message);
              runtime_permission();
 
-        if (isTracker==false){
+        if (runtime_permission()==false){
                 // i.setFlags(DriveFile.MODE_READ_ONLY);
                //
-                iGPS = new Intent(getActivity().getApplicationContext(),GPS_Service.class);
-                getActivity().getApplicationContext().startService(iGPS);
-            this.drawMap();
+            Toast.makeText(getContext(), "EKOTI TEEE", Toast.LENGTH_SHORT).show();
+             //   iGPS = new Intent(getActivity().getApplicationContext(),GPS_Service.class);
+               //getActivity().getApplicationContext().startService(iGPS);
+            //this.drawMap();
             }else{
                 Toast.makeText(getActivity(), "View Kinshasa", Toast.LENGTH_SHORT).show();
                 startPoint=new GeoPoint(-4.3685,15.3575);
-                this.drawMap(startPoint);
             }
+
             //  locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0.0f, this);
             // SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.hospital_fragment);
             //  mapFragment.getMapAsync(this);
@@ -300,9 +258,36 @@ public class HospitalsFragment extends Fragment {
         return viewBase;
 
     }
+    public void DrawMap(GeoPoint geoPoint){
+        if (mapView==null){
+            mapView=viewBase.findViewById(R.id.mapViewer);
+            mapView.setTileSource(TileSourceFactory.MAPNIK);
+            mapView.setBuiltInZoomControls(false);
+            mapView.setMultiTouchControls(true);
+            mapController = mapView.getController();
+            mapController.setZoom(12);
+            mapController.animateTo(geoPoint);
+            markerPoint=new Marker(mapView);
+            markerPoint.setPosition(geoPoint);
+            markerPoint.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+            markerPoint.setIcon(getResources().getDrawable(R.drawable.iconposition));
+            mapView.getOverlays().add(markerPoint);
+            mapView.setVisibility(View.VISIBLE);
+        }else{
+            mapView.getOverlays().remove(markerPoint);
+            markerPoint.setPosition(geoPoint);
+            markerPoint.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+            markerPoint.setIcon(getResources().getDrawable(R.drawable.iconposition));
+            mapView.getOverlays().add(markerPoint);
+            mapController.animateTo(geoPoint);
+        }
+
+    }
     private void drawMap(){
+       // LocationServices
+        
         //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
-        /*GeoPoint startPointLocalDB=new GeoPoint(-4.3685,15.3575);
+        GeoPoint startPointLocalDB=new GeoPoint(-4.3685,15.3575);
         mapView=viewBase.findViewById(R.id.mapViewer);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setBuiltInZoomControls(false);
@@ -312,8 +297,12 @@ public class HospitalsFragment extends Fragment {
         mapController.animateTo(startPointLocalDB);
         mapController.setZoom(13);
         mapView.setVisibility(View.VISIBLE);
-        */
-        //AddMarkersWithOutGPS(viewBase,"Kinshasa",startPointLocalDB);
+        markerPoint=new Marker(mapView);
+        markerPoint.setPosition(startPointLocalDB);
+        markerPoint.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+        markerPoint.setIcon(getResources().getDrawable(R.drawable.iconposition));
+        mapView.getOverlays().add(markerPoint);
+        AddMarkersWithOutGPS(viewBase,"Kinshasa",startPointLocalDB);
     }
     private void drawMap(GeoPoint geoPoint){
         //Toast.makeText(getActivity(), "StartPoint: "+startPoint.getLatitude(), Toast.LENGTH_SHORT).show();
@@ -345,7 +334,7 @@ public class HospitalsFragment extends Fragment {
                 AddMarkers(viewBase,address.getLocality(),center);
                 //Toast.makeText(getActivity().getApplicationContext(), "Town:"+address.getLocality(),Toast.LENGTH_SHORT).show();
             }else {
-                if (startPoint.getLatitude()!=center.getLatitude() && startPoint.getLongitude()!=center.getLongitude()){
+
                     mapView.getOverlays().remove(markerPoint);
                     startPoint=center;
                     mapController.animateTo(center);
@@ -360,7 +349,7 @@ public class HospitalsFragment extends Fragment {
                     AddMarkers(viewBase,address.getLocality(),center);
                    // refreshQuery=true;
 
-                }
+
             }
         }catch (Exception e){
             Toast.makeText(getActivity().getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -466,7 +455,7 @@ public class HospitalsFragment extends Fragment {
 
 
     public void AddMarkersWithOutGPS(final View view, final String localityName, final GeoPoint geoPoint){
-        if (refreshQuery){
+
             try{
                 if (Network.statusConnectivity(getActivity().getApplicationContext())){
 
@@ -490,7 +479,7 @@ public class HospitalsFragment extends Fragment {
 
                                     // Add a marker in Sydney and move the camera
                                     //GeoPoint geoPoint=new GeoPoint(lat,lng);
-                                    if (mapView==null){
+
                                         mapView=view.findViewById(R.id.mapViewer);
                                         mapView.setTileSource(TileSourceFactory.MAPNIK);
                                         mapView.setBuiltInZoomControls(true);
@@ -499,7 +488,7 @@ public class HospitalsFragment extends Fragment {
                                         mapController.setZoom(13);
                                         startPoint = new GeoPoint(lat,lng);
                                         mapController.animateTo(startPoint);
-                                    }
+
 
                                     JSONArray coordonates=jObject.getJSONArray("Coordonates");
                                     Polygon polygon = null;
@@ -554,10 +543,8 @@ public class HospitalsFragment extends Fragment {
             }catch(Exception e){
 
             }
-            refreshQuery=false;
-        }else {
+            //refreshQuery=false;
 
-        }
     }
 
 

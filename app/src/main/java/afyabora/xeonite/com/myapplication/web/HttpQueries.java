@@ -43,7 +43,7 @@ public class HttpQueries extends AsyncTask<Void, Void, Void> {
         this.urlString=url;
         this.context=ctx;
 
-            switch (language){
+           switch (language){
                 case "fr":
                     message_title=ctx.getResources().getString(R.string.loading_viewmap_fr_title);
                     message=ctx.getResources().getString(R.string.loading_viewmap_fr_msg);
@@ -64,11 +64,12 @@ public class HttpQueries extends AsyncTask<Void, Void, Void> {
                     break;
             }
 
+
     }
 
     @Override
     protected void onPreExecute(){
-        pDialog=new ProgressDialog(this.context, R.style.MyAlertDialogStyle);
+        pDialog=new ProgressDialog(this.context,R.style.MyAlertDialogStyle);
         pDialog.setTitle(message_title);
         pDialog.setMessage(message);
         pDialog.setCancelable(false);
@@ -91,6 +92,7 @@ public class HttpQueries extends AsyncTask<Void, Void, Void> {
             while((input=reader.readLine())!=null){
                 response+=input;
             }
+            //response=reader.readLine();
             httpCnx.disconnect();
 
         } catch (MalformedURLException e) {
@@ -99,6 +101,7 @@ public class HttpQueries extends AsyncTask<Void, Void, Void> {
         } catch (IOException e) {
             Toast.makeText(context,e.getMessage(),Toast.LENGTH_LONG).show();
         }
+
 
         return null;
     }
@@ -115,6 +118,7 @@ public class HttpQueries extends AsyncTask<Void, Void, Void> {
             queryCallback.getResponse(e.getMessage());
 
         }
+
 
     }
 }

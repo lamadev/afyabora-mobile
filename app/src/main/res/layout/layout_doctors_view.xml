@@ -7,13 +7,7 @@
     android:layout_height="wrap_content">
 
 
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:layout_scrollFlags="scroll|enterAlways"
-        app:titleTextColor="@color/colorGreen"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,11 +40,20 @@
                     android:text="Ophtamologue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:numStars="4"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:stepSize="0.5"
+                    android:rating="2.0" />
+
             </LinearLayout>
 
 
         </LinearLayout>
-    </android.support.v7.widget.Toolbar>
+
 
 
 </LinearLayout>
