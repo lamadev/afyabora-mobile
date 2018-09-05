@@ -81,13 +81,13 @@ public class osmActivity extends AppCompatActivity {
         mLocationListener=new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                geocoder=new Geocoder(osmActivity.this);
                 try {
+                    geocoder=new Geocoder(osmActivity.this);
                     address=geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0);
                     startPoint=new GeoPoint(location.getLatitude(),location.getLongitude());
                     DrawMap(startPoint);
 
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 Toast.makeText(osmActivity.this, "Lat :"+location.getLatitude()+"lng :"+location.getLongitude(), Toast.LENGTH_SHORT).show();
@@ -100,7 +100,7 @@ public class osmActivity extends AppCompatActivity {
 
             @Override
             public void onProviderEnabled(String s) {
-                Toast.makeText(osmActivity.this, "The Service is on", Toast.LENGTH_SHORT).show();
+                Toast.makeText(osmActivity.this, "The Service is on", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -109,9 +109,14 @@ public class osmActivity extends AppCompatActivity {
             }
         };
 
-        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+       try{
+           runtime_permission();
+           mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0.0f, mLocationListener);
+           mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0.0f, mLocationListener);
+       }catch (Exception e){
+           Toast.makeText(getApplicationContext(), "MESSERROR :"+e.getMessage(), Toast.LENGTH_SHORT).show();
+       }
     }
         public void DrawMap(GeoPoint geoPoint){
             if (mapView==null){
